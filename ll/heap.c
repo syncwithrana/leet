@@ -2,90 +2,97 @@
 
 #define MAX_SIZE 100
 
+typedef struct {
+    int key;
+    int val;
+} HeapNode;
 
-void swap(int *a, int *b) {
-    int temp = *a;
-    *a = *b;
-    *b = temp;
-}
-
-int compare(int a, int b) {
-    if (a > b) return 1;
-    if (a < b) return -1;
+int heap_compare(HeapNode a, HeapNode b) {
+    if (a.key < b.key) return 1;
+    if (a.key > b.key) return -1;
     return 0;
 }
 
-void printArray(int arr[], int n) {
+void heap_swap_node(HeapNode *a, HeapNode *b) {
+    HeapNode tmp = *a;
+    *a = *b;
+    *b = tmp;
+}
+
+void heap_print(HeapNode heap[], int n) {
     for (int i = 0; i < n; i++) {
-        printf("%d ", arr[i]);
+        printf("%d:%d ", heap[i].key, heap[i].val);
     }
     printf("\n");
 }
 
-void heapify(int arr[], int n, int i) {
+void heapify(HeapNode heap[], int n, int i) {
     int largest = i;
     int l = 2 * i + 1;
     int r = 2 * i + 2;
 
-    if (l < n && compare(arr[l], arr[largest]) > 0)
+    if (l < n && heap_compare(heap[l], heap[largest]) > 0)
         largest = l;
-    if (r < n && compare(arr[r], arr[largest]) > 0)
+    if (r < n && heap_compare(heap[r], heap[largest]) > 0)
         largest = r;
 
     if (largest != i) {
-        swap(&arr[i], &arr[largest]);
-        heapify(arr, n, largest);
+        heap_swap_node(&heap[i], &heap[largest]);
+        heapify(heap, n, largest);
     }
 }
 
-void buildHeap(int arr[], int n) {
+void heap_build(HeapNode heap[], int n) {
     for (int i = n / 2 - 1; i >= 0; i--)
-        heapify(arr, n, i);
+        heapify(heap, n, i);
 }
 
-void bubbleUp(int arr[], int i) {
+void heap_bubble_up(HeapNode heap[], int i) {
     while (i > 0) {
         int parent = (i - 1) / 2;
-        if (compare(arr[parent], arr[i]) < 0) {
-            swap(&arr[parent], &arr[i]);
+        if (heap_compare(heap[parent], heap[i]) < 0) {
+            heap_swap_node(&heap[parent], &heap[i]);
             i = parent;
         } else break;
     }
 }
 
-void push(int arr[], int *n, int val) {
+void heap_push(HeapNode heap[], int *n, int key, int val) {
     if (*n >= MAX_SIZE) {
         printf("Heap overflow!\n");
         return;
     }
-    arr[*n] = val;
-    bubbleUp(arr, *n);
+    heap[*n].key = key;
+    heap[*n].val = val;
+    heap_bubble_up(heap, *n);
     (*n)++;
 }
 
-int pop(int arr[], int *n) {
-    if (*n <= 0) return -1;
-    int root = arr[0];
-    arr[0] = arr[--(*n)];
-    heapify(arr, *n, 0);
+HeapNode heap_pop(HeapNode heap[], int *n) {
+    HeapNode empty = { .key = -1, .val = -1 };
+    if (*n <= 0) return empty;
+    HeapNode root = heap[0];
+    heap[0] = heap[--(*n)];
+    heapify(heap, *n, 0);
     return root;
 }
 
 int main() {
-    int arr[MAX_SIZE] = {3, 1, 6, 5, 2, 4};
+    HeapNode heap[MAX_SIZE] = { {3,30}, {1,10}, {6,60}, {5,50}, {2,20}, {4,40} };
     int n = 6;
 
-    buildHeap(arr, n);
+    heap_build(heap, n);
     printf("Initial heap: ");
-    printArray(arr, n);
+    heap_print(heap, n);
 
-    push(arr, &n, 10);
-    printf("After push(10): ");
-    printArray(arr, n);
+    heap_push(heap, &n, 10, 100);
+    printf("After push(10:100): ");
+    heap_print(heap, n);
 
-    printf("Popped max: %d\n", pop(arr, &n));
+    HeapNode p = heap_pop(heap, &n);
+    printf("Popped max: %d:%d\n", p.key, p.val);
     printf("After pop: ");
-    printArray(arr, n);
+    heap_print(heap, n);
 
     return 0;
 }
