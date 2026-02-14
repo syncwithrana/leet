@@ -13,7 +13,7 @@ int heap_compare(HeapNode a, HeapNode b) {
     return 0;
 }
 
-void heap_swap_node(HeapNode *a, HeapNode *b) {
+void heap_swap(HeapNode *a, HeapNode *b) {
     HeapNode tmp = *a;
     *a = *b;
     *b = tmp;
@@ -37,7 +37,7 @@ void heapify(HeapNode heap[], int n, int i) {
         largest = r;
 
     if (largest != i) {
-        heap_swap_node(&heap[i], &heap[largest]);
+        heap_swap(&heap[i], &heap[largest]);
         heapify(heap, n, largest);
     }
 }
@@ -51,7 +51,7 @@ void heap_bubble_up(HeapNode heap[], int i) {
     while (i > 0) {
         int parent = (i - 1) / 2;
         if (heap_compare(heap[parent], heap[i]) < 0) {
-            heap_swap_node(&heap[parent], &heap[i]);
+            heap_swap(&heap[parent], &heap[i]);
             i = parent;
         } else break;
     }
